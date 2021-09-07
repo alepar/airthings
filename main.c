@@ -5,6 +5,7 @@
 
 #include "config_app.h"
 #include "config_devices.h"
+#include "metrics.h"
 
 static void fatal(const char* msg) {
     char *errmsg = strerror(errno);
@@ -28,7 +29,14 @@ int main(int argc, char *argv[]) {
     }
 
     guint size = g_hash_table_size(cfg->serial_nos);
-    printf("%d", size);
+    printf("%d\n", size);
+
+    metrics_register();
+    metrics_start_server();
+    prom_counter_inc(my_counter, NULL);
+
+    int done = 0;
+    while(done == 0) {}
 
     return 0;
 }
