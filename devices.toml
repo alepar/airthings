@@ -1,0 +1,11 @@
+[123]
+    room = "Master Bedroom"
+    name = "abc"
+
+[456]
+    room = "Media Room"
+    name = "abc23"
+
+[789]
+    room = "Study Room"
+    name = "abc2345"
