@@ -28,12 +28,11 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    guint size = g_hash_table_size(cfg->serial_nos);
-    printf("%d\n", size);
-
-    metrics_register();
+    metrics_register(cfg->label_keys, cfg->label_keys_count);
     metrics_start_server();
-    prom_counter_inc(my_counter, NULL);
+
+    DeviceConfig *dev_cfg = device_config_get(cfg, "123");
+    prom_counter_inc(my_counter, dev_cfg->label_values);
 
     int done = 0;
     while(done == 0) {}

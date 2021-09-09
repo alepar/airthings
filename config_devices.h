@@ -12,20 +12,16 @@
 
 typedef struct {
     GHashTable* serial_nos;
+    const char** label_keys;
+    int  label_keys_count;
 } DevicesConfig;
 
 typedef struct {
-    char* key;
-    char* value;
-} KeyValue;
-
-typedef struct {
-    KeyValue* keyValues;
-    int keyValuesCount;
+    const char** label_values;
 } DeviceConfig;
 
 DevicesConfig* devices_config_new();
 int devices_config_read(char* filename, DevicesConfig* config);
-int device_config_get(DevicesConfig* config, uint64_t serialNo, DeviceConfig* info);
+DeviceConfig* device_config_get(DevicesConfig* config, char* serialNo);
 
 #endif //AIRTHINGS_C_CONFIG_DEVICES_H

@@ -2,9 +2,11 @@
 
 prom_counter_t *my_counter = NULL;
 
-int metrics_register() {
+int metrics_register(const char** label_keys, int labels_count) {
     prom_collector_registry_default_init();
-    my_counter = prom_collector_registry_must_register_metric(prom_counter_new("my_counter", "counts things", 0, NULL));
+    my_counter = prom_collector_registry_must_register_metric(
+            prom_counter_new("my_counter", "counts things", labels_count, label_keys)
+    );
     promhttp_set_active_collector_registry(NULL);
     return 0;
 }

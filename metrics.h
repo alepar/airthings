@@ -10,7 +10,7 @@
 #include <prom.h>
 #include <promhttp.h>
 
-int metrics_register();
+int metrics_register(const char** label_keys, int labels_count);
 int metrics_start_server();
 
 extern prom_counter_t *my_counter;
