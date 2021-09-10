@@ -15,14 +15,14 @@ bool app_error() {
 
 void app_error_print() {
     if (app_error()) {
-        fprintf(stderr, "ERROR: %s", errmsg);
+        fprintf(stderr, "ERROR: %s\n", errmsg);
         memset(errmsg, 0, sizeof(errmsg));
     }
 }
 
 void app_error_exit() {
     if (app_error()) {
-        fprintf(stderr, "FATAL: %s", errmsg);
+        fprintf(stderr, "FATAL: %s\n", errmsg);
         exit(1);
     }
 }
