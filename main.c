@@ -34,12 +34,45 @@ int main(int argc, char *argv[]) {
     metrics_start_server();
     app_error_exit();
 
-    DeviceConfig *dev_cfg = device_config_get(cfg, "123");
-    prom_counter_inc(my_counter, dev_cfg->label_values);
+    if (app_config->enable_resets) {
+        bluez_device_up();
+        app_error_exit();
+    }
 
-    int done = 0;
-    while(done == 0) {}
+    bluez_scan();
 
-    return 0;
+//    DeviceConfig *dev_cfg = device_config_get(cfg, "123");
+//    prom_counter_inc(my_counter, dev_cfg->label_values);
+/*
+    while(true) {
+        bool bluez_err = false;
+        if (bluez_err) {
+            printf("bluez error while scanning detected");
+            if (app_config->enable_resets) {
+                printf("device reset enabled, resetting\n");
+                if (bluez_device_reset()) {
+                    printf("failed to reset device, exiting\n");
+                    exit(1);
+                }
+            } else {
+                printf("device reset disabled, ignoring\n");
+            }
+            bluez_err_msg = NULL;
+        }
+
+        bluez_err_msg = bluez_scan_airthings(&found_devices);
+        foreach (dev in found_devices) {
+            // update_known_devices
+        }
+        free(found_devices);
+
+        foreach (dev in known_devices) {
+            // has_been_seen_recently? remove if not
+            if (time_to_query(dev)) {
+                bluez_err_msg = bluez_query_airthings_waveplus(dev, &sensor_values);
+                metrics_update(sensor_values, dev);
+            }
+        }
+    }*/
 }
 
