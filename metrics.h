@@ -1,17 +1,10 @@
 #ifndef AIRTHINGS_METRICS_H
 #define AIRTHINGS_METRICS_H
 
-#include <signal.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-
-#include <microhttpd.h>
 #include <prom.h>
-#include <promhttp.h>
 
-int metrics_register(const char** label_keys, int labels_count);
-int metrics_start_server();
+void metrics_register(const char** label_keys, int labels_count);
+void metrics_start_server();
 
 extern prom_counter_t *my_counter;
 

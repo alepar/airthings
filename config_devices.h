@@ -1,14 +1,7 @@
 #ifndef AIRTHINGS_C_CONFIG_DEVICES_H
 #define AIRTHINGS_C_CONFIG_DEVICES_H
 
-#include <errno.h>
 #include <glib.h>
-#include <stdint.h>
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-
-#include "toml.h"
 
 typedef struct {
     GHashTable* serial_nos;
@@ -21,7 +14,7 @@ typedef struct {
 } DeviceConfig;
 
 DevicesConfig* devices_config_new();
-int devices_config_read(char* filename, DevicesConfig* config);
+void devices_config_read(char* filename, DevicesConfig* config);
 DeviceConfig* device_config_get(DevicesConfig* config, char* serialNo);
 
 #endif //AIRTHINGS_C_CONFIG_DEVICES_H

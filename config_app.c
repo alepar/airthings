@@ -1,3 +1,10 @@
+#include <argp.h>
+#include <stdlib.h>
+
+// https://www.gnu.org/software/libc/manual/html_node/Argp-Examples.html
+// https://www.linuxtopia.org/online_books/programming_books/gnu_c_programming_tutorial/argp-example.html
+
+#include "app_errors.h"
 #include "config_app.h"
 
 static struct argp_option options[] = {
@@ -30,6 +37,11 @@ static struct argp argp = {options, parse_opt, args_doc, doc};
 
 AppConfig* parse_args(int argc, char *argv[]) {
     AppConfig* config = (AppConfig*)malloc(sizeof(AppConfig));
+    if (!config) {
+        app_error_push("failed to allocate app config");
+        return NULL;
+    }
+
     config->devices_config_file = "devices.toml";
     config->enable_resets = 0;
     argp_parse (&argp, argc, argv, 0, 0, config);
