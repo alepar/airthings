@@ -67,14 +67,16 @@ void devices_config_read(char* filename, DevicesConfig* config) {
         app_error_push("failed to parse devices config toml file: failed to collect label keys");
         return;
     }
+    config->label_keys_count++; // fixed 'serial_no' label
     config->label_keys = (const char * *) malloc(sizeof(char*) * config->label_keys_count);
     if (!config->label_keys) {
         app_error_push("failed to parse devices config toml file: failed to allocate label keys array");
         return;
     }
 
-    for (int i=0; i<config->label_keys_count; i++) {
-        config->label_keys[i] = gptr[i];
+    config->label_keys[0] = "serial_no";
+    for (int i=1; i<config->label_keys_count; i++) {
+        config->label_keys[i] = gptr[i-1];
     }
     g_free(gptr);
     g_hash_table_destroy(label_keys_set); // note that the keys themselves are preserved for future use below
@@ -100,7 +102,8 @@ void devices_config_read(char* filename, DevicesConfig* config) {
             app_error_push("failed to parse devices config toml file for device '%s': failed to allocate label_values", serial_no);
             return;
         }
-        for (int j=0; j<config->label_keys_count; j++) {
+        label_values[0] = strdup(serial_no);
+        for (int j=1; j<config->label_keys_count; j++) {
             const char* label_name = config->label_keys[j];
             label_values[j] = toml_string_in(labels_table, label_name).u.s;
         }
