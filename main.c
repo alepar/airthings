@@ -46,13 +46,10 @@ int main(int argc, char *argv[]) {
     SensorValues values;
     airthings_parse_sensor_values(&values, data, data_len);
 
-    printf("atmPressure: %f\n", values.atmPressure);
-    printf("co2Level: %f\n", values.co2Level);
-    printf("humidity: %f\n", values.humidity);
-    printf("radonLong: %hu\n", values.radonLong);
-    printf("radonShort: %hu\n", values.radonShort);
-    printf("temperature: %f\n", values.temperature);
-    printf("vocLevel: %f\n", values.vocLevel);
+    char* label_values[] = {"temp"};
+
+    metrics_update(&values, label_values);
+    while (true);
 
 //    DeviceConfig *dev_cfg = device_config_get(cfg, "123");
 //    prom_counter_inc(my_counter, dev_cfg->label_values);
