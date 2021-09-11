@@ -3,19 +3,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <gattlib.h>
 
 #include "app_errors.h"
+#include "airthings.h"
 #include "bluez.h"
 #include "bluez_scan.h"
 #include "config_app.h"
 #include "config_devices.h"
 #include "metrics.h"
-
-static void fatal(const char* msg) {
-    char *errmsg = strerror(errno);
-    fprintf(stderr, "ERROR: %s - %s\n", msg, errmsg?errmsg:"");
-    exit(1);
-}
 
 int main(int argc, char *argv[]) {
     AppConfig *app_config = parse_args(argc, argv);
@@ -39,7 +35,24 @@ int main(int argc, char *argv[]) {
         app_error_exit();
     }
 
-    bluez_scan();
+//    bluez_scan();
+
+    const char* addr = "00:81:F9:F8:17:AC";
+
+    size_t data_len;
+    uint8_t* data;
+    airthings_read_characteristic(NULL, addr, &data, &data_len);
+
+    SensorValues values;
+    airthings_parse_sensor_values(&values, data, data_len);
+
+    printf("atmPressure: %f\n", values.atmPressure);
+    printf("co2Level: %f\n", values.co2Level);
+    printf("humidity: %f\n", values.humidity);
+    printf("radonLong: %hu\n", values.radonLong);
+    printf("radonShort: %hu\n", values.radonShort);
+    printf("temperature: %f\n", values.temperature);
+    printf("vocLevel: %f\n", values.vocLevel);
 
 //    DeviceConfig *dev_cfg = device_config_get(cfg, "123");
 //    prom_counter_inc(my_counter, dev_cfg->label_values);
