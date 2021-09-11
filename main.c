@@ -15,24 +15,24 @@
 
 int main(int argc, char *argv[]) {
     AppConfig *app_config = parse_args(argc, argv);
-    app_error_exit();
+    app_onerror_exit();
 
     DevicesConfig *cfg = devices_config_new();
-    app_error_exit();
+    app_onerror_exit();
 
     if (app_config->devices_config_file) {
         devices_config_read(app_config->devices_config_file, cfg);
-        app_error_exit();
+        app_onerror_exit();
     }
 
     metrics_register(cfg->label_keys, cfg->label_keys_count);
-    app_error_exit();
+    app_onerror_exit();
     metrics_start_server();
-    app_error_exit();
+    app_onerror_exit();
 
     if (app_config->enable_resets) {
         bluez_device_up();
-        app_error_exit();
+        app_onerror_exit();
     }
 
 //    bluez_scan();

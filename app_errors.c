@@ -9,19 +9,19 @@ static char temp[10240] = {0};
 static char temp2[10240] = {0};
 static char errmsg[10240] = {0};
 
-bool app_error() {
+bool app_iserror() {
     return strlen(errmsg) > 0;
 }
 
-void app_error_print() {
-    if (app_error()) {
+void app_onerror_print() {
+    if (app_iserror()) {
         fprintf(stderr, "ERROR: %s\n", errmsg);
         memset(errmsg, 0, sizeof(errmsg));
     }
 }
 
-void app_error_exit() {
-    if (app_error()) {
+void app_onerror_exit() {
+    if (app_iserror()) {
         fprintf(stderr, "FATAL: %s\n", errmsg);
         exit(1);
     }

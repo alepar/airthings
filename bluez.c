@@ -23,13 +23,13 @@ static int close_ctl(int ctl) {
 
 void bluez_device_reset() {
     bluez_device_down();
-    if (app_error()) {
+    if (app_iserror()) {
         app_error_push("failed to reset bluez device");
         return;
     }
 
     bluez_device_up();
-    if (app_error()) {
+    if (app_iserror()) {
         app_error_push("failed to reset bluez device");
     }
 }
