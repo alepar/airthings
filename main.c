@@ -31,28 +31,18 @@ int main(int argc, char *argv[]) {
     app_onerror_exit();
 
     if (app_config->enable_resets) {
-        bluez_device_up();
+        bluez_device_reset();
         app_onerror_exit();
     }
 
-//    bluez_scan();
+    DiscoveredSensor* sensors;
+    size_t sensors_count;
+    bluez_scan(&sensors, &sensors_count);
+    app_onerror_exit();
 
-    const char* addr = "00:81:F9:F8:17:AC";
+    printf("found: %zu\n", sensors_count);
+    free(sensors);
 
-    size_t data_len;
-    uint8_t* data;
-    airthings_read_characteristic(NULL, addr, &data, &data_len);
-
-    SensorValues values;
-    airthings_parse_sensor_values(&values, data, data_len);
-
-    char* label_values[] = {"temp"};
-
-    metrics_update(&values, label_values);
-    while (true);
-
-//    DeviceConfig *dev_cfg = device_config_get(cfg, "123");
-//    prom_counter_inc(my_counter, dev_cfg->label_values);
 /*
     while(true) {
         bool bluez_err = false;

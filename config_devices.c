@@ -8,7 +8,7 @@
 #include "config_devices.h"
 
 DevicesConfig* devices_config_new() {
-    DevicesConfig* cfg = (DevicesConfig*)malloc(sizeof(DevicesConfig));
+    DevicesConfig* cfg = (DevicesConfig*) calloc(1, sizeof(DevicesConfig));
     if (!cfg) {
         app_error_push("failed to allocate devices config");
         return NULL;
@@ -68,7 +68,7 @@ void devices_config_read(char* filename, DevicesConfig* config) {
         return;
     }
     config->label_keys_count++; // fixed 'serial_no' label
-    config->label_keys = (const char * *) malloc(sizeof(char*) * config->label_keys_count);
+    config->label_keys = (const char**) calloc(config->label_keys_count, sizeof(char*));
     if (!config->label_keys) {
         app_error_push("failed to parse devices config toml file: failed to allocate label keys array");
         return;
@@ -92,12 +92,12 @@ void devices_config_read(char* filename, DevicesConfig* config) {
             return;
         }
 
-        DeviceConfig* dev_cfg = (DeviceConfig *) malloc(sizeof(DeviceConfig));
+        DeviceConfig* dev_cfg = (DeviceConfig*) calloc(1, sizeof(DeviceConfig));
         if (!dev_cfg) {
             app_error_push("failed to parse devices config toml file for device '%s': failed to allocate DeviceConfig", serial_no);
             return;
         }
-        char** label_values = (char**)malloc(sizeof(char*) * config->label_keys_count);
+        char** label_values = (char**) calloc(config->label_keys_count, sizeof(char*));
         if (!label_values) {
             app_error_push("failed to parse devices config toml file for device '%s': failed to allocate label_values", serial_no);
             return;

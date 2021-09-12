@@ -36,7 +36,7 @@ static char doc[] = "airthings -- Collects sensor data from Airthings devices an
 static struct argp argp = {options, parse_opt, args_doc, doc};
 
 AppConfig* parse_args(int argc, char *argv[]) {
-    AppConfig* config = (AppConfig*)malloc(sizeof(AppConfig));
+    AppConfig* config = (AppConfig*) calloc(1, sizeof(AppConfig));
     if (!config) {
         app_error_push("failed to allocate app config");
         return NULL;
