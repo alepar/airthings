@@ -18,6 +18,8 @@ Reference: https://github.com/labapart/gattlib/blob/master/README.md#build-gattl
 
 ## Install libprom
 - Install deps `apt install libmicrohttpd-dev`
+- Install deps `apt install libprom-dev libpromhttp-dev`
+- If above failed (no such packages), then:
 - Install docker engine `apt install docker-ce`
 - Make sure your user has access to docker (eg add to `docker` group)
 - check out `https://github.com/digitalocean/prometheus-client-c`
