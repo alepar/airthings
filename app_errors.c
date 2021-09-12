@@ -13,11 +13,14 @@ bool app_iserror() {
     return strlen(errmsg) > 0;
 }
 
-void app_onerror_print() {
+bool app_onerror_print() {
     if (app_iserror()) {
         fprintf(stderr, "ERROR: %s\n", errmsg);
         memset(errmsg, 0, sizeof(errmsg));
+        return true;
     }
+
+    return false;
 }
 
 void app_onerror_exit() {

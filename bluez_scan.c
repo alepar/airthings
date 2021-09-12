@@ -5,6 +5,7 @@
 #include <gattlib.h>
 
 #include "airthings.h"
+#include "app_errors.h"
 #include "bluez_scan.h"
 
 #define BLE_SCAN_TIMEOUT   10
@@ -14,6 +15,21 @@ typedef struct {
     size_t discovered_count;
     size_t allocated_count;
 } DiscoveryResult;
+
+static void ensure_available(DiscoveryResult* result) {
+    if (result->discovered_count < result->allocated_count) {
+        return;
+    }
+
+    size_t new_count = result->allocated_count * 2 + 8;
+
+    result->data = realloc(result->data, new_count * sizeof(DiscoveredSensor));
+    if (!result->data) {
+        app_error_push("failed to ensure_available for DiscoveryResult: %d", new_count);
+        return;
+    }
+    result->allocated_count = new_count;
+}
 
 static void ble_discovered_device(void *adapter, const char* addr, const char* name, void *user_data) {
     gattlib_advertisement_data_t* adv_data;
@@ -29,7 +45,7 @@ static void ble_discovered_device(void *adapter, const char* addr, const char* n
             DiscoveryResult* result = (DiscoveryResult*) user_data;
             ensure_available(result);
             if (app_iserror()) {
-                app_push_error("failed to append discovered device to the result: serialNo %d at %s", serialNo, addr);
+                app_error_push("failed to append discovered device to the result: serialNo %d at %s", serialNo, addr);
                 return;
             }
 
@@ -37,26 +53,11 @@ static void ble_discovered_device(void *adapter, const char* addr, const char* n
             result->data[i].serialNo = serialNo;
 
             if (strlen(addr)*sizeof(char) >= sizeof(result->data[i].addr)) {
-                app_push_error("failed to append discovered device to the result: address does not fit: %s", addr);
+                app_error_push("failed to append discovered device to the result: address does not fit: %s", addr);
             }
             strcpy(result->data[i].addr, addr);
         }
     }
-}
-
-static void ensure_available(DiscoveryResult* result) {
-    if (result->discovered_count < result->allocated_count) {
-        return;
-    }
-
-    size_t new_count = result->allocated_count*2 + 8;
-
-    result->data = realloc(new_count * sizeof(DiscoveredSensor));
-    if (!result->data) {
-        app_error_push("failed to ensure_available for DiscoveryResult: %d", new_count);
-        return;
-    }
-    result->allocated_count = new_count;
 }
 
 void bluez_scan(DiscoveredSensor** discovered_devices, size_t* discovered_devices_count) {

@@ -17,15 +17,15 @@ int main(int argc, char *argv[]) {
     AppConfig *app_config = parse_args(argc, argv);
     app_onerror_exit();
 
-    DevicesConfig *cfg = devices_config_new();
+    DevicesConfig *dev_cfg = devices_config_new();
     app_onerror_exit();
 
     if (app_config->devices_config_file) {
-        devices_config_read(app_config->devices_config_file, cfg);
+        devices_config_read(app_config->devices_config_file, dev_cfg);
         app_onerror_exit();
     }
 
-    metrics_register(cfg->label_keys, cfg->label_keys_count);
+    metrics_register(dev_cfg->label_keys, dev_cfg->label_keys_count);
     app_onerror_exit();
     metrics_start_server();
     app_onerror_exit();
@@ -35,44 +35,60 @@ int main(int argc, char *argv[]) {
         app_onerror_exit();
     }
 
-    DiscoveredSensor* sensors;
-    size_t sensors_count;
-    bluez_scan(&sensors, &sensors_count);
-    app_onerror_exit();
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "EndlessLoop"
+    bool ble_error = false;
 
-    printf("found: %zu\n", sensors_count);
-    free(sensors);
-
-/*
     while(true) {
-        bool bluez_err = false;
-        if (bluez_err) {
-            printf("bluez error while scanning detected");
+        if (ble_error) {
             if (app_config->enable_resets) {
-                printf("device reset enabled, resetting\n");
-                if (bluez_device_reset()) {
-                    printf("failed to reset device, exiting\n");
-                    exit(1);
-                }
-            } else {
-                printf("device reset disabled, ignoring\n");
+                printf("resetting bluez device\n");
+                bluez_device_reset();
+                app_onerror_exit();
             }
-            bluez_err_msg = NULL;
+            ble_error = false;
         }
 
-        bluez_err_msg = bluez_scan_airthings(&found_devices);
-        foreach (dev in found_devices) {
-            // update_known_devices
+        DiscoveredSensor *sensors;
+        size_t sensors_count;
+        bluez_scan(&sensors, &sensors_count);
+        if (app_onerror_print()) {
+            ble_error = true;
+            continue;
         }
-        free(found_devices);
 
-        foreach (dev in known_devices) {
-            // has_been_seen_recently? remove if not
-            if (time_to_query(dev)) {
-                bluez_err_msg = bluez_query_airthings_waveplus(dev, &sensor_values);
-                metrics_update(sensor_values, dev);
+        printf("found: %zu\n", sensors_count);
+        for (int i = 0; i < sensors_count; i++) {
+            DiscoveredSensor *sensor = &sensors[i];
+            printf("- %lu at %s\n", sensor->serialNo, sensor->addr);
+            uint8_t *data;
+            size_t data_len;
+            airthings_read_characteristic(NULL, sensor->addr, &data, &data_len);
+            if (app_onerror_print()) {
+                ble_error = true;
+                continue;
+            }
+
+            SensorValues values;
+            airthings_parse_sensor_values(&values, data, data_len);
+            if (app_onerror_print()) {
+                ble_error = true;
+                continue;
+            }
+
+            char serialNoStr[128];
+            sprintf(serialNoStr, "%lu", sensor->serialNo);
+            DeviceConfig *dev = device_config_get(dev_cfg, serialNoStr);
+            metrics_update(&values, dev->label_values);
+            if (app_onerror_print()) {
+                ble_error = true;
+                continue;
             }
         }
-    }*/
+        free(sensors);
+
+        //TODO remove stale sensor values
+    }
+#pragma clang diagnostic pop
 }
 

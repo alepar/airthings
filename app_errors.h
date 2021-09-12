@@ -7,7 +7,8 @@
 bool app_iserror();
 
 // if error is raised, prints it to stderr and clears it
-void app_onerror_print();
+// return true if printed
+bool app_onerror_print();
 
 // if error is raised, prints it to stderr and terminates
 void app_onerror_exit();
