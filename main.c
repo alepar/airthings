@@ -38,16 +38,19 @@ int main(int argc, char *argv[]) {
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "EndlessLoop"
     bool ble_error = false;
+    int ble_query_ok = 0;
 
     while(true) {
-        if (ble_error) {
+        if (ble_error && !ble_query_ok) {
             if (app_config->enable_resets) {
                 printf("resetting bluez device\n");
                 bluez_device_reset();
                 app_onerror_exit();
             }
-            ble_error = false;
         }
+
+        ble_error = false;
+        ble_query_ok = 0;
 
         DiscoveredSensor *sensors;
         size_t sensors_count;
@@ -75,6 +78,8 @@ int main(int argc, char *argv[]) {
                 ble_error = true;
                 continue;
             }
+
+            ble_query_ok++;
 
             char serialNoStr[128];
             sprintf(serialNoStr, "%lu", sensor->serialNo);
